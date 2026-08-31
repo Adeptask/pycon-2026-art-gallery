@@ -4,7 +4,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Code Art Wall</title>
+<link rel="canonical" href="https://adeptask.github.io/pycon-2026-art-gallery/">
+<meta name="description" content="Every piece written in Python at the booth, and the code that drew it. 74 pieces from PyCon AU 2026.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- What a pasted link becomes in Slack, Teams, iMessage and the rest. The
+     image has to be an absolute URL: a relative one resolves against the
+     unfurling service, not against this site, and silently shows nothing. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="PyCon AU 2026 Code Art Wall">
+<meta property="og:title" content="PyCon AU 2026 Code Art Wall">
+<meta property="og:description" content="Every piece written in Python at the booth, and the code that drew it. 74 pieces from PyCon AU 2026.">
+<meta property="og:url" content="https://adeptask.github.io/pycon-2026-art-gallery/">
+<meta property="og:image" content="https://adeptask.github.io/pycon-2026-art-gallery/share-card.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A wall of generative artwork, titled PyCon AU 2026 Code Art Wall">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PyCon AU 2026 Code Art Wall">
+<meta name="twitter:description" content="Every piece written in Python at the booth, and the code that drew it. 74 pieces from PyCon AU 2026.">
+<meta name="twitter:image" content="https://adeptask.github.io/pycon-2026-art-gallery/share-card.png">
+<title>PyCon AU 2026 Code Art Wall</title>
 <meta name="description" content="Every piece written at the booth, and the Python that drew it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -201,9 +223,53 @@ span.linenos.special { color: #50fa7b; background-color: #6272a4; padding-left: 
 .hl .vm { color: #8BE9FD; font-style: italic } /* Name.Variable.Magic */
 .hl .il { color: #FFB86C } /* Literal.Number.Integer.Long */
   .hl { background: none; }
+
+  /* ---- masthead ---- */
+  header { padding: 30px 20px 22px; text-align: center; }
+  #eyebrow { margin: 0 0 10px; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.18em; color: #a398ff; }
+  header h1 { margin: 0; font-size: clamp(20px, 3.4vw, 34px); font-weight: 800;
+    letter-spacing: -0.01em; }
+  #tagline { margin: 12px auto 0; max-width: 54ch; font-size: 13px;
+    line-height: 1.6; color: var(--dim); }
+  #rule { width: 92px; height: 3px; background: var(--accent);
+    margin: 18px auto 0; }
+
+  /* ---- the highlight ----
+     The piece grows over its neighbours rather than displacing them. A tile
+     that displaces its neighbours has to put them somewhere, and there is
+     nowhere: its own cell is inside the space it grew into. Overlapping is
+     the only way nothing else on the screen moves. */
+  /* A zoomed tile can reach past the edge of the window, and on the right
+     that is a horizontal scrollbar on a page that should not have one. The
+     script anchors the zoom to whichever edge a tile is against; this is the
+     backstop for the moment before it does. */
+  body { overflow-x: hidden; }
+  .tile { transition: transform 170ms ease, box-shadow 170ms ease;
+    transform-origin: center center; }
+  .tile:hover, .tile:focus-visible, .tile.lit {
+    transform: scale(1.7); z-index: 5;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, .8); }
+  .tile:hover, .tile.lit { outline: none; }
+  /* The byline comes with the zoom, at the size the zoom leaves it. */
+  .tile:hover .byline, .tile:focus-visible .byline, .tile.lit .byline {
+    opacity: 1; font-size: 8px; padding: 3px 5px; }
+  /* A piece the page chose, rather than one the reader is pointing at. */
+  .tile.lit { outline: 2px solid var(--accent); outline-offset: -2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .tile { transition: none; }
+  }
+
 </style>
 </head>
 <body>
+<header>
+  <p id="eyebrow">JetBrains &#215; Adeptask &#215; Aquion</p>
+  <h1>PyCon AU 2026 Code Art Wall</h1>
+  <p id="tagline">Every piece here was written in Python at the booth and
+     rendered from that code. Click one to read it.</p>
+  <div id="rule"></div>
+</header>
 <div id="all">
   <button class="tile" type="button"
         data-id="34" data-kind="static"
@@ -20127,5 +20193,78 @@ function fromHash() {
 window.addEventListener("hashchange", fromHash);
 fromHash();
 </script>
+
+<script>
+/* One piece is lit at a time. The pointer decides while it is over the grid;
+   otherwise the page picks one every few seconds so the wall is never still.
+   Only from the pieces already on screen: scrolling the page out from under
+   somebody to show them a piece they did not ask for is not a highlight. */
+(function () {
+  const EVERY_MS = 4000;
+  const grid = document.getElementById("all");
+  const overlay = document.getElementById("overlay");
+  const quiet = matchMedia("(prefers-reduced-motion: reduce)");
+  let lit = null, pointerInside = false;
+
+  /* Grow away from the edge rather than through it. A tile in the first
+     column has nothing to its left to grow into, so it grows rightward from
+     its own left edge, and the same on the right. Measured before this: 25 of
+     the 74 pieces reached past an edge, the rightmost to 1502px in a 1440px
+     window, which is a horizontal scrollbar. */
+  const SCALE = 1.7;
+  function anchor(tile) {
+    const box = tile.getBoundingClientRect();
+    const grow = (SCALE - 1) / 2 * box.width;
+    const x = box.left - grow < 0 ? "left"
+            : box.right + grow > innerWidth ? "right" : "center";
+    tile.style.transformOrigin = x + " center";
+  }
+  grid.addEventListener("pointerover", e => {
+    const tile = e.target.closest(".tile");
+    if (tile) anchor(tile);
+  }, true);
+  grid.addEventListener("focusin", e => {
+    const tile = e.target.closest(".tile");
+    if (tile) anchor(tile);
+  });
+
+  const onScreen = () => [...grid.querySelectorAll(".tile")].filter(t => {
+    if (t.hidden) return false;
+    const box = t.getBoundingClientRect();
+    return box.bottom > 0 && box.top < innerHeight;
+  });
+
+  function light(tile) {
+    if (lit === tile) return;
+    if (lit) lit.classList.remove("lit");
+    lit = tile;
+    if (tile) { anchor(tile); tile.classList.add("lit"); }
+  }
+
+  function rotate() {
+    if (pointerInside || quiet.matches) return;
+    if (overlay.classList.contains("open")) return;
+    if (document.hidden) return;          /* nobody is looking */
+    const visible = onScreen();
+    if (visible.length < 2) return light(null);
+    let pick;
+    do { pick = visible[Math.floor(Math.random() * visible.length)]; }
+    while (pick === lit);
+    light(pick);
+  }
+
+  /* The pointer always wins, and the page takes over again once it leaves. */
+  grid.addEventListener("pointerover", e => {
+    pointerInside = true;
+    light(null);                          /* :hover does the work from here */
+  });
+  grid.addEventListener("pointerleave", () => { pointerInside = false; });
+  addEventListener("scroll", () => { if (lit && !pointerInside) light(null); },
+                   { passive: true });
+
+  setInterval(rotate, EVERY_MS);
+})();
+</script>
+
 </body>
 </html>
