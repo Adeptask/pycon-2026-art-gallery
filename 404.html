@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PyCon AU 2026 Code Art Wall</title>
+<meta name="robots" content="noindex">
+<!-- The wall used to live at this domain and every piece had its own page at
+     /piece/<id>. Attendees saved those links. GitHub Pages has no server to
+     redirect them with, so this page does it: /piece/20 opens the gallery on
+     piece 20, and anything else opens the gallery. -->
+<meta http-equiv="refresh" content="3; url=/">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px; padding: 24px;
+    background: #000; color: #fff; text-align: center;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  h1 { font-size: 17px; font-weight: 800; margin: 0; }
+  p { margin: 0; font-size: 13px; color: rgba(255,255,255,.62); max-width: 46ch;
+    line-height: 1.6; }
+  a { color: #6B57FF; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Taking you to the wall</h1>
+<p>The pieces moved. Every one of them is still here, together with the Python
+   that drew it.</p>
+<p><a href="/">PyCon AU 2026 Code Art Wall</a></p>
+<script>
+// A piece's own page becomes that piece, opened on the gallery. Anything
+// else becomes the gallery itself.
+var piece = /^\/piece\/(\d+)\/?$/.exec(location.pathname);
+location.replace(piece ? "/#piece-" + piece[1] : "/");
+</script>
+</body>
+</html>
