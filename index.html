@@ -71,6 +71,12 @@
   /* The playing video covers its own poster exactly, so the swap is invisible
      rather than a jump. */
   .tile video.live { position: absolute; inset: 0; z-index: 0; }
+  /* Once the loop is actually playing it is the only thing to show. Several
+     pieces render on a transparent background, and those composite over the
+     still underneath them: two different frames of the same animation at
+     once, which reads as the piece doubled. Hidden rather than removed, so
+     the still is still there to come back to. */
+  .tile.playing img { visibility: hidden; }
   /* Above the piece, still or playing. Document order already puts them
      there; this says so, so that moving the markup cannot quietly hide the
      credit on every animated piece. */
@@ -20066,6 +20072,7 @@ function distanceFromCentre(poster) {
 function stopPlaying(poster) {
   const video = poster.parentElement.querySelector("video.live");
   if (video) { video.removeAttribute("src"); video.load(); video.remove(); }
+  poster.parentElement.classList.remove("playing");
   live.delete(poster);
 }
 
@@ -20095,6 +20102,10 @@ function startPlaying(poster) {
   // A video that will not play leaves the still showing, which is the right
   // thing to look at anyway.
   video.addEventListener("error", () => stopPlaying(poster));
+  // Only once there are real frames on screen. Hiding the still at attach
+  // time would leave the tile empty for as long as the loop takes to load.
+  video.addEventListener("playing",
+    () => poster.parentElement.classList.add("playing"));
   // Straight after the still it covers, and so before the trophy and the
   // byline. Appended to the tile instead it would paint over both, because
   // positioned siblings without a z-index stack in document order.
