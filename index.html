@@ -63,7 +63,7 @@
 
   .tile { position: relative; aspect-ratio: 1; margin: 0; padding: 0;
     display: block; cursor: pointer; overflow: hidden;
-    border: 1px solid var(--line); background: var(--ground); }
+    border: none; background: var(--ground); }
   .tile img, .tile video { width: 100%; height: 100%; display: block;
     /* contain, not cover: a piece is composed to its own frame, and cropping
        it to fill a square would edit somebody's artwork. */
@@ -94,11 +94,22 @@
   .byline.none { font-style: italic; color: var(--dim); }
 
   /* Drawn as whole pixels and kept that way at every size. */
-  .trophy { position: absolute; top: 4px; right: 4px; width: 22px;
-    height: 22px; display: block; pointer-events: none; }
-  .trophy svg { width: 100%; height: 100%; display: block;
+  /* The number came off the cup. Three trophies each carrying a digit read
+     as first, second and third place, which is the wrong competition: there
+     was one winner on each day of the event. The day is said in words
+     underneath instead, where it cannot be mistaken for a ranking. */
+  .trophy { position: absolute; top: 4px; right: 4px; display: flex;
+    flex-direction: column; align-items: center; gap: 1px;
+    pointer-events: none; }
+  .trophy svg { width: 22px; height: 22px; display: block;
     shape-rendering: crispEdges;
     filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.8)); }
+  /* On its own dark chip, because the pieces behind it run from black to
+     white and gold on a pale sky is unreadable. Square, like everything
+     else on the page. */
+  .trophy b { font-size: 9px; font-weight: 600; color: #F2B33D;
+    letter-spacing: 0.02em; white-space: nowrap;
+    background: rgba(0, 0, 0, 0.78); padding: 1px 4px; }
 
   /* ---- the focused piece ---- */
   #overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.88);
@@ -119,9 +130,10 @@
     flex-wrap: wrap; }
   #dialog-byline { font-size: 15px; margin: 0; font-weight: 800; }
   #dialog-byline span { color: var(--dim); font-weight: 400; }
-  #dialog-trophy { width: 22px; height: 22px; }
-  #dialog-trophy svg { width: 100%; height: 100%; display: block;
+  #dialog-trophy { display: inline-flex; align-items: center; gap: 7px; }
+  #dialog-trophy svg { width: 22px; height: 22px; display: block;
     shape-rendering: crispEdges; }
+  #dialog-trophy b { font-size: 12px; color: #F2B33D; }
   /* Filled rather than outlined, as on the wall: purple text on near-black
      is too faint to be an obvious control. */
   .nav, #close { background: none; color: var(--accent); font: inherit;
@@ -264,10 +276,15 @@ span.linenos.special { color: #50fa7b; background-color: #6272a4; padding-left: 
 </head>
 <body>
 <header>
-  <p id="eyebrow">JetBrains &#215; Adeptask &#215; Aquion</p>
+  <p id="eyebrow"><a href="https://www.jetbrains.com" target="_blank"
+       rel="noopener noreferrer">JetBrains</a> &#215; <a
+       href="https://www.adeptask.com" target="_blank"
+       rel="noopener noreferrer">Adeptask</a> &#215; <a
+       href="https://www.aquion.com.au" target="_blank"
+       rel="noopener noreferrer">Aquion</a></p>
   <h1>PyCon AU 2026 Code Art Wall</h1>
-  <p id="tagline">Every piece here was written in Python at the booth and
-     rendered from that code. Click one to read it.</p>
+  <p id="tagline">Every piece here was written in Python and rendered from
+     that code. Click one to read it.</p>
   <div id="rule"></div>
 </header>
 <div id="all">
@@ -298,7 +315,7 @@ span.linenos.special { color: #50fa7b; background-color: #6272a4; padding-left: 
         data-byline="Adam Smith" data-poster="media/28.poster.jpg">
   <img src="media/28.poster.jpg" loading="lazy" data-video="media/28.webm"
        alt="piece by Adam Smith">
-  <span class="trophy" title="Day 1 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="4" height="1"/><rect x="7" y="1" width="4" height="1"/><rect x="2" y="2" width="3" height="1"/><rect x="7" y="2" width="4" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="3" height="1"/><rect x="7" y="3" width="3" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="3" height="1"/><rect x="7" y="4" width="3" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g><g fill="#4A2D08"><rect x="6" y="1" width="1" height="1"/><rect x="5" y="2" width="2" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/><rect x="5" y="5" width="3" height="1"/></g></svg></span>
+  <span class="trophy" title="Day 1 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="4" height="1"/><rect x="7" y="1" width="4" height="1"/><rect x="2" y="2" width="3" height="1"/><rect x="7" y="2" width="4" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="3" height="1"/><rect x="7" y="3" width="3" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="3" height="1"/><rect x="7" y="4" width="3" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g></svg><b>Day 1</b></span>
   <span class="byline">Adam Smith</span>
 </button><button class="tile" type="button"
         data-id="56" data-kind="animated"
@@ -306,7 +323,7 @@ span.linenos.special { color: #50fa7b; background-color: #6272a4; padding-left: 
         data-byline="Cow" data-poster="media/56.poster.jpg">
   <img src="media/56.poster.jpg" loading="lazy" data-video="media/56.webm"
        alt="piece by Cow">
-  <span class="trophy" title="Day 2 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="3" height="1"/><rect x="8" y="1" width="3" height="1"/><rect x="2" y="2" width="5" height="1"/><rect x="8" y="2" width="3" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="8" y="3" width="2" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="2" height="1"/><rect x="6" y="4" width="4" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g><g fill="#4A2D08"><rect x="5" y="1" width="3" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="5" y="5" width="3" height="1"/></g></svg></span>
+  <span class="trophy" title="Day 2 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="3" height="1"/><rect x="8" y="1" width="3" height="1"/><rect x="2" y="2" width="5" height="1"/><rect x="8" y="2" width="3" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="8" y="3" width="2" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="2" height="1"/><rect x="6" y="4" width="4" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g></svg><b>Day 2</b></span>
   <span class="byline">Cow</span>
 </button><button class="tile" type="button"
         data-id="66" data-kind="animated"
@@ -314,7 +331,7 @@ span.linenos.special { color: #50fa7b; background-color: #6272a4; padding-left: 
         data-byline="Ibisco" data-poster="media/66.poster.jpg">
   <img src="media/66.poster.jpg" loading="lazy" data-video="media/66.webm"
        alt="piece by Ibisco">
-  <span class="trophy" title="Day 3 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="3" height="1"/><rect x="8" y="1" width="3" height="1"/><rect x="2" y="2" width="5" height="1"/><rect x="8" y="2" width="3" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="8" y="3" width="2" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="4" height="1"/><rect x="8" y="4" width="2" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g><g fill="#4A2D08"><rect x="5" y="1" width="3" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="5" y="3" width="3" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="5" y="5" width="3" height="1"/></g></svg></span>
+  <span class="trophy" title="Day 3 winner"><svg viewBox="0 0 13 13" aria-hidden="true" focusable="false"><g fill="#6B4A12"><rect x="2" y="0" width="9" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="11" y="1" width="1" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="11" y="2" width="2" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="10" y="3" width="1" height="1"/><rect x="12" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="10" y="4" width="1" height="1"/><rect x="12" y="4" width="1" height="1"/><rect x="1" y="5" width="2" height="1"/><rect x="10" y="5" width="2" height="1"/><rect x="2" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="4" y="8" width="1" height="1"/><rect x="8" y="8" width="1" height="1"/><rect x="5" y="9" width="1" height="1"/><rect x="7" y="9" width="1" height="1"/><rect x="4" y="10" width="5" height="1"/><rect x="3" y="11" width="1" height="1"/><rect x="9" y="11" width="1" height="1"/><rect x="2" y="12" width="9" height="1"/></g><g fill="#F2B33D"><rect x="2" y="1" width="3" height="1"/><rect x="8" y="1" width="3" height="1"/><rect x="2" y="2" width="5" height="1"/><rect x="8" y="2" width="3" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="8" y="3" width="2" height="1"/><rect x="11" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="4" height="1"/><rect x="8" y="4" width="2" height="1"/><rect x="11" y="4" width="1" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="8" y="5" width="2" height="1"/><rect x="3" y="6" width="7" height="1"/><rect x="4" y="7" width="5" height="1"/><rect x="5" y="8" width="3" height="1"/><rect x="6" y="9" width="1" height="1"/><rect x="4" y="11" width="5" height="1"/></g></svg><b>Day 3</b></span>
   <span class="byline">Ibisco</span>
 </button><button class="tile" type="button"
         data-id="16" data-kind="animated"
